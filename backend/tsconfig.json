@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "pretty": true,
+    "alwaysStrict": true,
+    "diagnostics": true,
+    // "strictNullChecks": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@services/*": [
+        "services/*"
+      ],
+      "@shared/*": [
+        "shared/*"
+      ]
+    },
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

@@ -1,0 +1,73 @@
+version: '3.5'
+
+services:
+
+  # Databases # #
+  postgres-test:
+    container_name: postgres-test
+    image: postgres:11.2-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-crud-node}
+      PGDATA: /data/postgres
+    ports:
+      - 5432:5432
+    networks:
+      - backend
+  redis-test:
+    container_name: redis-test
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redisdata:/data/db
+    networks:
+      - backend
+      
+  mongo-test:
+    container_name: mongo-test
+    image: mongo:4.0
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodata:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin-123
+      - MONGO_INITDB_ROOT_PASSWORD=password-123
+    networks:
+      - backend
+  # # Main Service ##
+  # nest-ts-boilerplate:
+  #   build: 
+  #     context: ./nest-ts-boilerplate
+  #     dockerfile: Dockerfile.dev
+  #   image: nest-ts-boilerplate:latest
+  #   container_name: nest-ts-boilerplate
+  #   depends_on:
+  #       - mongo-exp
+  #   volumes:
+  #       - /var/app/node_modules
+  #       - ./nest-ts-boilerplate:/var/app
+  #   ports:
+  #     - 3000:3000
+  #   networks:
+  #       - backend
+  #   env_file:
+  #     - .env
+  #   environment:
+  #    - SERVICE_NAME=EXPERIENCE
+  #   restart: always
+
+
+
+networks:
+  backend:
+
+volumes:
+  mongodata:
+    driver: local
+  pgadmin:
+    driver: local
+  redisdata:
+    driver: local
