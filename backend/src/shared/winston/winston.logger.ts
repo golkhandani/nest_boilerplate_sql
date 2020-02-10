@@ -4,6 +4,7 @@ import { winstonConstants } from '@shared/constants';
 
 class Logger {
 
+    public options: winston.LoggerOptions;
     public logger: winston.Logger;
 
     private label: string = 'GENERAL';
@@ -21,10 +22,10 @@ class Logger {
         // tslint:disable-next-line: no-shadowed-variable
         const consoleFormat = printf(({ level, message, label, timestamp }) => {
             // tslint:disable-next-line:max-line-length
-            return `${this.levelColorMap[level] || this.color.FgCyan}[${label}]\t${timestamp}${this.color.Reset}\t${this.levelColorMap[level] || this.color.Reset}${level.toUpperCase()}${this.color.Reset}:\t${message}`;
+            return `${this.levelColorMap[level] || this.color.FgCyan}[${label}]\t${this.levelColorMap[level] || this.color.Reset}${level.toUpperCase()}${this.color.Reset}\t${timestamp}${this.color.Reset}\t${message}`;
         });
         this.label = serviceName;
-        this.logger = winston.createLogger({
+        this.options = {
             format: combine(
                 winston.format.prettyPrint(),
                 winston.format.metadata(),
@@ -47,9 +48,11 @@ class Logger {
                 // new EmailTransport({ level: 'error', format: logFormat }),
                 //  new winston.transports.Console({ format: consoleFormat }),
             ],
-        });
+        };
+        this.logger = winston.createLogger(this.options)
         return this;
     }
 }
 
-export const Winston = (new Logger(winstonConstants.LOGGER_SERVICE_NAME)).logger;
+export const WinstonOptions = (new Logger(winstonConstants.LOGGER_SERVICE_NAME)).options;
+export const WinstonLogger = (new Logger(winstonConstants.LOGGER_SERVICE_NAME)).logger;

@@ -1,5 +1,5 @@
 import { Logger, LoggerService } from '@nestjs/common';
-import { Winston } from './winston.logger';
+import { WinstonLogger as Winston } from '@shared/winston/winston.logger';
 
 export class WLogger extends Logger {
     static error(message: string) {

@@ -8,9 +8,13 @@ import { AuthorizationModule } from './services/authorization/authorization.modu
 import { mongoConstants } from '@shared/constants/mongoConstants';
 import { EventsModule } from './sockets/events/events.module';
 
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
+import { WinstonOptions } from '@shared/winston/winston.logger';
+
 @Module({
   imports: [
     // BookModule,
+    WinstonModule.forRoot(WinstonOptions),
     MongooseModule.forRoot(mongoConstants.uri, mongoConstants.options),
     // GraphQLModule.forRoot({
     //   installSubscriptionHandlers: true,

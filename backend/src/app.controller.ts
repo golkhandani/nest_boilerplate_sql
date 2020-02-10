@@ -1,15 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
-import { Winston } from '@shared/winston/winston.logger';
+import { Controller, Get, Inject } from '@nestjs/common';
+import { Logger } from 'winston';
 
 @Controller()
 export class AppController {
-  constructor() { }
+  constructor(@Inject('winston') private readonly logger: Logger) {
+    console.log(this.logger);
+  }
 
   @Get('ping')
   ping(): string {
-    Winston.error('error');
-    Winston.info('info');
-    Winston.warn('info');
+    this.logger.info('EDwqe');
+    // Winston.error('error');
+    // Winston.info('info');
+    // Winston.warn('info');
     return 'pong';
   }
 
