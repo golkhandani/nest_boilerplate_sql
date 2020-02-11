@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 
-import { BadRequestException, Injectable, Inject, CACHE_MANAGER, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject, CACHE_MANAGER, NotFoundException, NotImplementedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { MulterFile } from '@shared/dtos/file.dto';
 
@@ -50,7 +50,7 @@ export class UsersProfileProvider {
 
     async updateProfile(user: UserInHeader, updates: UpdateUser): Promise<boolean> {
         // const x :UpdateOptions={}
-        const eu = await this.usersRepository.update(
+        const [rows, updateds]  = await this.usersRepository.update(
             updates,
             {
                 where: {_id: user._id },
@@ -67,7 +67,7 @@ export class UsersProfileProvider {
         //     },
         // );
         // const eu = await this.UserModel.findByIdAndUpdate(user._id, { $set: updates }, { new: true });
-        return true;
+        return updateds[0];
 
     }
     /**
@@ -75,7 +75,7 @@ export class UsersProfileProvider {
      * @param user payload user from jwt contain _id
      * @param file uploaded file from user
      */
-    async updateProfilePicture(user: UserInHeader, file: MulterFile): Promise<User> {
+    async updateProfilePicture(user: UserInHeader, file: MulterFile): Promise<any> {
         if (!file) {
             throw new BadRequestException('select file');
         } else {
@@ -87,14 +87,16 @@ export class UsersProfileProvider {
             //     pictureUpdate,
             //     { new: true },
             // );
-            const eu = await this.usersRepository.update(
+            const [data, meta] = await this.usersRepository.sequelize.query('SELECT * FROM users');
+            console.log('');
+            const [rows, updateds] = await this.usersRepository.update(
                 { picture: file.path },
                 {
                     where: {_id: user._id },
                     returning: true,
                 },
             );
-            return eu;
+            return rows === 1 ? updateds[0] : new NotImplementedException();
         }
     }
 }

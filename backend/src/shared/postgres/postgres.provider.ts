@@ -21,7 +21,9 @@ export const postgresProviders = [
                 RefreshTokenEntity,
                 UserScopeEntity,
             ]);
+
             await sequelize.sync();
+
             return sequelize;
         },
     },
