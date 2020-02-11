@@ -7,11 +7,15 @@ import { AuthenticationProvider } from '@services/authentication/authentication.
 import {
     PhoneVerificationModelName, PhoneVerificationSchema, RefreshTokenModelName,
     RefreshTokenSchema,
+    PhoneVerificationsRepository,
+    RefreshTokensRepository,
 } from '@services/authentication/models';
 import { UserAlreadyExist } from '@services/authentication/validators';
 import { jwtConstants } from '@shared/constants';
 import { UserModelName, UserSchema, UsersRepository } from '@shared/models/users.model';
 import { PostgresModule } from '@shared/postgres/postgres.module';
+import { AuthorizationProvider } from '@services/authorization/authorization.provider';
+import { UserScopesRepository } from '@services/authorization/models';
 
 @Module({
     imports: [
@@ -37,7 +41,11 @@ import { PostgresModule } from '@shared/postgres/postgres.module';
     providers: [
         UserAlreadyExist,
         AuthenticationProvider,
-        ...UsersRepository
+        AuthorizationProvider,
+        ...UsersRepository,
+        ...PhoneVerificationsRepository,
+        ...RefreshTokensRepository,
+        ...UserScopesRepository,
     ],
     controllers: [
         AuthenticationController,

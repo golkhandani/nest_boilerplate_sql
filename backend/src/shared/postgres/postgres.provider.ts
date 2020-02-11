@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize-typescript';
 import { UserEntity } from '@shared/models';
 import { PhoneVerificationEntity, RefreshTokenEntity } from '@services/authentication/models';
+import { UserScopeEntity } from '@services/authorization/models';
 
 export const postgresProviders = [
     {
@@ -17,7 +18,9 @@ export const postgresProviders = [
             sequelize.addModels([
                 UserEntity,
                 PhoneVerificationEntity,
-                RefreshTokenEntity]);
+                RefreshTokenEntity,
+                UserScopeEntity,
+            ]);
             await sequelize.sync();
             return sequelize;
         },

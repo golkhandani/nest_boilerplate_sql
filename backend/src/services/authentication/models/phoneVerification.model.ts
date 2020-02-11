@@ -57,3 +57,6 @@ export class PhoneVerificationEntity extends Model<PhoneVerificationEntity> {
     @Column({ field: 'updated_at' })
     updatedAt: Date;
 }
+
+export const PHONE_VERIFICATION_REPOSITORY_NAME = 'PhoneVerificationsRepository';
+export const PhoneVerificationsRepository = [{ provide: PHONE_VERIFICATION_REPOSITORY_NAME, useValue: PhoneVerificationEntity }];

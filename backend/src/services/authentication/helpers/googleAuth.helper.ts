@@ -36,7 +36,7 @@ export class Google {
                 break;
         }
     }
-    async getUserInfo(): Promise<User> {
+    async getUserInfo(): Promise<{name: string, google: string, picture: string}> {
         const response = await axios.default.get<GoogleUser>(this.url, {
             params: this.params,
         });

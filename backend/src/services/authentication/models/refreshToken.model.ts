@@ -51,7 +51,7 @@ export class RefreshTokenEntity extends Model<RefreshTokenEntity> {
     @BelongsTo(() => UserEntity)
     user: UserEntity;
 
-    @Column({type: DataType.TEXT})
+    @Column({type: DataType.DATE})
     expires: Date;
 
     @CreatedAt
@@ -62,3 +62,6 @@ export class RefreshTokenEntity extends Model<RefreshTokenEntity> {
     @Column({ field: 'updated_at' })
     updatedAt: Date;
 }
+
+export const REFRESH_TOKEN_REPOSITORY_NAME = 'RefreshTokensRepository';
+export const RefreshTokensRepository = [{ provide: REFRESH_TOKEN_REPOSITORY_NAME, useValue: RefreshTokenEntity }];

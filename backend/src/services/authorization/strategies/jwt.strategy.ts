@@ -39,7 +39,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         if (this.blocked.includes(payload._id)) {
             return new HttpException('you are blocked', 403);
         } else {
-            payload.scopes = (await this.authorizationProvider.getScopes(payload._id) || []).concat([UserScopes.ME]);
+            payload.scopes = (await this.authorizationProvider.getScopes(payload._id) || []).concat([UserScopes.READ]);
             return payload;
         }
     }

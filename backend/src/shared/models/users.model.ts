@@ -124,7 +124,8 @@ export class User {
 }
 
 /** postgres */
-import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, DeletedAt, TableOptions} from 'sequelize-typescript';
+import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, DeletedAt, TableOptions, HasOne} from 'sequelize-typescript';
+import { RefreshTokenEntity } from '@services/authentication/models';
 
 export const UserTableOptions: TableOptions = {
     tableName: 'users',
@@ -170,6 +171,10 @@ export class UserEntity extends Model<UserEntity> {
         defaultValue: UserRoles.USER,
     })
     role: UserRoles;
+
+    @HasOne(() => RefreshTokenEntity)
+    // tslint:disable-next-line:variable-name
+    refresh_token: RefreshTokenEntity;
 
     @CreatedAt
     @Column({ field: 'created_at' })
