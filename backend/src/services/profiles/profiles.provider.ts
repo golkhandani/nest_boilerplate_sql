@@ -1,10 +1,10 @@
 import { Model } from 'mongoose';
 
-import { BadRequestException, Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject, CACHE_MANAGER, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { MulterFile } from '@shared/dtos/file.dto';
 
-import { User, UserModelName } from '../../shared/models/users.model';
+import { User, UserModelName, USER_REPOSITORY_NAME, UserEntity } from '../../shared/models/users.model';
 import { UpdateUser } from './dtos';
 import { CacheManager } from '@shared/interfaces/cache.interface';
 import { UserInHeader } from '@shared/decorators';
@@ -12,19 +12,23 @@ import { UserInHeader } from '@shared/decorators';
 @Injectable()
 export class UsersProfileProvider {
     constructor(
+        @Inject(USER_REPOSITORY_NAME) private readonly usersRepository: typeof UserEntity,
+
         @InjectModel(UserModelName) private readonly UserModel: Model<User>,
         @Inject(CACHE_MANAGER) private readonly cacheManager: CacheManager) {
 
     }
     async sayHello(user: User): Promise<User> {
-        const eu = await this.UserModel.findById(user._id);
+        // const eu = await this.UserModel.findById(user._id);
+        const eu = await this.usersRepository.findOne({ where: {_id: user._id} });
         return eu;
     }
     /**
      * get all users profile(just available to admin)
      */
     async getProfiles(): Promise<User[]> {
-        const eu = await this.UserModel.find().lean();
+        // const eu = await this.UserModel.find().lean();
+        const eu = await this.usersRepository.findAndCountAll();
         return eu;
     }
     /**
@@ -32,12 +36,38 @@ export class UsersProfileProvider {
      * @param user payload user from jwt contain _id
      */
     async getProfile(user: UserInHeader): Promise<User> {
-        const eu = await this.UserModel.findById(user._id);
+        // const eu = await this.UserModel.findById(user._id);
+        const eu = await this.usersRepository.findOne({
+             where: {_id: user._id},
+             attributes: [
+                '_id', 'name',
+                'picture', 'address',
+                'role', 'verified',
+                'createdAt', 'updatedAt'],
+        });
         return eu;
     }
-    async updateProfile(user: UserInHeader, updates: UpdateUser): Promise<User> {
-        const eu = await this.UserModel.findByIdAndUpdate(user._id, { $set: updates }, { new: true });
-        return eu;
+
+    async updateProfile(user: UserInHeader, updates: UpdateUser): Promise<boolean> {
+        // const x :UpdateOptions={}
+        const eu = await this.usersRepository.update(
+            updates,
+            {
+                where: {_id: user._id },
+                returning: true,
+            },
+        );
+
+        // const eu = await this.usersRepository.update(
+        //     updates,
+        //     {
+        //         where: {_id: user._id },
+        //         plain: true,
+        //         returning: true,
+        //     },
+        // );
+        // const eu = await this.UserModel.findByIdAndUpdate(user._id, { $set: updates }, { new: true });
+        return true;
 
     }
     /**
@@ -49,13 +79,20 @@ export class UsersProfileProvider {
         if (!file) {
             throw new BadRequestException('select file');
         } else {
-            const pictureUpdate = {
-                $set: { picture: file.path },
-            };
-            const eu = await this.UserModel.findByIdAndUpdate(
-                user._id,
-                pictureUpdate,
-                { new: true },
+            // const pictureUpdate = {
+            //     $set: { picture: file.path },
+            // };
+            // const eu = await this.UserModel.findByIdAndUpdate(
+            //     user._id,
+            //     pictureUpdate,
+            //     { new: true },
+            // );
+            const eu = await this.usersRepository.update(
+                { picture: file.path },
+                {
+                    where: {_id: user._id },
+                    returning: true,
+                },
             );
             return eu;
         }

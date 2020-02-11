@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 
-import { BadRequestException, Injectable, Inject } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject, NotAcceptableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserScope, UserScopeModelName, UserScopes, USER_SCOPE_REPOSITORY_NAME, UserScopeEntity } from '@services/authorization/models';
 
@@ -12,7 +12,11 @@ export class AuthorizationProvider {
         // @InjectModel(UserScopeModelName) private readonly UserScopeModel: Model<UserScope>,
     ) { }
     async getScopes(userId: string): Promise<string[]> {
+        console.log('getScopes', 1, userId);
         const userScopesObj: UserScopeEntity = await this.userScopesRepository.findOne({ where: { user_id: userId }});
+        if (!userScopesObj) {
+            throw new NotAcceptableException();
+        }
         const scopes =  Object.keys(UserScopes).filter(item => userScopesObj[item] === true);
         // const userScopes = await this.UserScopeModel.findOne({ user: userId });
         // return (userScopes || {} as UserScope).scopes;

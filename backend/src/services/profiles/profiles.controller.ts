@@ -72,7 +72,7 @@ export class UsersProfileController {
     @Put('me')
     async updateProfile(
         @UserFromHeader() user: UserInHeader,
-        @Body() updates: UpdateUser): Promise<Api<User>> {
+        @Body() updates: UpdateUser): Promise<Api<boolean>> {
         return {
             data: await this.usersProfileProvider.updateProfile(user, updates),
             message: 'user owner',
