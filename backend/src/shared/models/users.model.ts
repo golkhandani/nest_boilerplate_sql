@@ -3,7 +3,7 @@ import { serverConstants } from '@shared/constants/serverConstants';
 import { ApiModelProperty } from '@nestjs/swagger';
 import { ObjectType, Field, ID } from 'type-graphql';
 
-export const UserModelName = 'User';
+export const UserModelName = 'user';
 
 export enum UserRoles {
     GUEST = 'GUEST',
@@ -80,8 +80,8 @@ export interface User extends mongoose.Document {
 @ObjectType()
 export class User {
     @ApiModelProperty()
-    // tslint:disable-next-line: variable-name
     @Field(type => ID)
+    // tslint:disable-next-line:variable-name
     _id: string;
 
     @ApiModelProperty()
@@ -122,3 +122,63 @@ export class User {
     @Field()
     role: UserRoles;
 }
+
+/** postgres */
+import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, DeletedAt, TableOptions} from 'sequelize-typescript';
+
+export const UserTableOptions: TableOptions = {
+    tableName: 'users',
+};
+@Table(UserTableOptions)
+export class UserEntity extends Model<UserEntity> {
+    @Column({
+        type: DataType.UUID,
+        defaultValue: DataType.UUIDV4,
+        primaryKey: true,
+    })
+    // tslint:disable-next-line:variable-name
+    _id: string;
+
+    /** Guest login */
+    @Column({type: DataType.TEXT})
+    fingerprint: string;
+
+    @Column({type: DataType.TEXT})
+    username: string;
+    @Column({type: DataType.TEXT})
+    email: string;
+    @Column({type: DataType.TEXT})
+    password: string;
+
+    @Column({type: DataType.TEXT})
+    google: string;
+    @Column({type: DataType.TEXT})
+    phone: string;
+
+    @Column({type: DataType.BOOLEAN})
+    verified: boolean;
+
+    @Column({type: DataType.TEXT})
+    name: string;
+    @Column({type: DataType.TEXT})
+    picture: string;
+    @Column({type: DataType.TEXT})
+    address: string;
+
+    @Column({
+        type: DataType.ENUM(...Object.keys(UserRoles)),
+        defaultValue: UserRoles.USER,
+    })
+    role: UserRoles;
+
+    @CreatedAt
+    @Column({ field: 'created_at' })
+    createdAt: Date;
+
+    @UpdatedAt
+    @Column({ field: 'updated_at' })
+    updatedAt: Date;
+}
+
+export const USER_REPOSITORY_NAME = 'UsersRepository';
+export const UsersRepository = [{ provide: USER_REPOSITORY_NAME, useValue: UserEntity }];

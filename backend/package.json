@@ -65,10 +65,13 @@
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
+    "pg": "^7.18.1",
     "rate-limit-redis": "^1.6.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
+    "sequelize": "^5.21.4",
+    "sequelize-typescript": "^1.1.0",
     "socket.io-redis": "^5.2.0",
     "swagger-ui-express": "^4.0.7",
     "type-graphql": "^0.17.5",
@@ -93,7 +96,7 @@
     "tsc-watch": "2.2.1",
     "tsconfig-paths": "3.8.0",
     "tslint": "5.16.0",
-    "typescript": "3.4.3"
+    "typescript": "3.7.2"
   },
   "jest": {
     "moduleFileExtensions": [

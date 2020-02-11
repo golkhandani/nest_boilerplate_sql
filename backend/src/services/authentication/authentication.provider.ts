@@ -3,7 +3,9 @@ import { compareSync, genSaltSync, hashSync } from 'bcrypt';
 import * as moment from 'moment';
 import { Model } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
-import { ForbiddenException, HttpException, Injectable, NotFoundException, BadRequestException, BadGatewayException, HttpStatus } from '@nestjs/common';
+import { ForbiddenException, HttpException,
+            Injectable, NotFoundException, BadRequestException,
+            BadGatewayException, HttpStatus, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 // dtos
@@ -21,12 +23,13 @@ import { bcryptConstants, jwtConstants, phoneConstants } from '@shared/constants
 // shared enums
 import { OS } from '@shared/enums';
 // shared models
-import { User, UserModelName, UserRoles } from '@shared/models';
+import { User, UserModelName, UserRoles, UserEntity, USER_REPOSITORY_NAME } from '@shared/models';
 import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class AuthenticationProvider {
     constructor(
+        @Inject(USER_REPOSITORY_NAME) private readonly usersRepository: typeof UserEntity,
         @InjectModel(UserModelName) private readonly UserModel: Model<User>,
         @InjectModel(PhoneVerificationModelName) private readonly PhoneVerificationModel: Model<PhoneVerification>,
         @InjectModel(RefreshTokenModelName) private readonly RefreshTokenModel: Model<RefreshToken>,
@@ -48,7 +51,7 @@ export class AuthenticationProvider {
     private async createRefreshToken(safeUser: User): Promise<string> {
         await this.RefreshTokenModel.deleteOne({ user: safeUser._id });
         const expires = moment().add(jwtConstants.expirationInterval, 'days').toDate();
-        const token = base64.encode(Math.random() + safeUser._id + Math.random());
+        const token = base64.encode(Math.random() + safeUser.id + Math.random());
         const newRefreshToken = new this.RefreshTokenModel({
             token,
             user: safeUser._id,
@@ -70,7 +73,6 @@ export class AuthenticationProvider {
             const payload = this.jwtService.verify(token, {
                 algorithms: [jwtConstants.algorithm],
             });
-            console.log(payload);
             const user = await this.UserModel.findById(payload._id);
 
             if (!user) {
@@ -104,14 +106,14 @@ export class AuthenticationProvider {
     }
     private async createTokenResponse(userObj: User): Promise<UserWithToken> {
         const user = {
-            _id: userObj._id,
+            id: userObj.id,
             role: userObj.role || UserRoles.GUEST,
         } as User;
         const payload = user;
         const accessToken = this.createAccessToken(payload);
         const refreshToken = await this.createRefreshToken(user);
         const tokenType = 'Bearer';
-        return { user: userObj, tokenType, refreshToken, accessToken };
+        return { user, tokenType, refreshToken, accessToken };
     }
     private async validatedUser(userObj: User, password: string) {
 
@@ -143,14 +145,18 @@ export class AuthenticationProvider {
     public async signAsGuest(headers: any): Promise<UserWithToken> {
         // TODO : change the way you get real fingerprint
         const fingerprint: string = headers.fingerprint || base64.encode(JSON.stringify(headers));
-        const existsUser: User = await this.UserModel.findOne({ fingerprint });
+
+        // const existsUser: User = await this.UserModel.findOne({ fingerprint });
+        const existsUser: User = await this.usersRepository.findOne({
+            where: { fingerprint },
+        });
+        // console.log('existsUser', existsUser);
         if (!existsUser) {
-            const userObj = {
-                fingerprint,
-                role: UserRoles.GUEST,
-            };
-            const newUser = new this.UserModel(userObj);
-            const savedUser = await newUser.save() as User;
+            const newUser = new UserEntity();
+            newUser.fingerprint = fingerprint,
+            newUser.role = UserRoles.GUEST;
+
+            const savedUser = await newUser.save();
             return await this.createTokenResponse(savedUser);
         } else {
             return await this.createTokenResponse(existsUser);
@@ -188,7 +194,7 @@ export class AuthenticationProvider {
     }
     private sendVerificationEmail(token: string) {
         // send email
-        console.log('MAIL SENT WITH TOKEN : ', token);
+        // console.log('MAIL SENT WITH TOKEN : ', token);
     }
     public async signupByEmailPass(userObj: SignupByEmail): Promise<UserWithToken> {
         (userObj as any).password = this.generatedHashPassword(userObj.password);

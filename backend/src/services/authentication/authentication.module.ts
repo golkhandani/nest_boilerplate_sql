@@ -10,10 +10,12 @@ import {
 } from '@services/authentication/models';
 import { UserAlreadyExist } from '@services/authentication/validators';
 import { jwtConstants } from '@shared/constants';
-import { UserModelName, UserSchema } from '@shared/models/users.model';
+import { UserModelName, UserSchema, UsersRepository } from '@shared/models/users.model';
+import { PostgresModule } from '@shared/postgres/postgres.module';
 
 @Module({
     imports: [
+        PostgresModule,
         MongooseModule.forFeature([
             {
                 name: UserModelName,
@@ -35,6 +37,7 @@ import { UserModelName, UserSchema } from '@shared/models/users.model';
     providers: [
         UserAlreadyExist,
         AuthenticationProvider,
+        ...UsersRepository
     ],
     controllers: [
         AuthenticationController,
