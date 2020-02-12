@@ -19,10 +19,10 @@ export class AuthorizationProvider {
     }
     async initScopes(userId: string, scopes: UserScopes[]) {
         const validatedScopes: any = {
-            ME: false,
-            READ: false,
-            WRITE: false,
-            GOD: false,
+            [UserScopes.ME]: false,
+            [UserScopes.READ]: false,
+            [UserScopes.WRITE]: false,
+            [UserScopes.GOD]: false,
         };
         scopes.forEach((scope) => {
             scope = scope.toUpperCase() as UserScopes;
@@ -51,7 +51,7 @@ export class AuthorizationProvider {
                 }
             });
         }
-        const newScopes = { $addToSet: { ...validatedScopes } };
+        const newScopes = { $set: { ...validatedScopes } };
         return await this.UserScopeModel.findOneAndUpdate({ user: userId }, newScopes, { new: true, upsert: true });
     }
     async removeScopes(userId: string, scopes: UserScopes[]): Promise<UserScope> {
@@ -68,7 +68,7 @@ export class AuthorizationProvider {
 
             });
         }
-        const newScopes = { $pull: { ...validatedScopes } };
+        const newScopes = { $set: { ...validatedScopes } };
         return await this.UserScopeModel.findOneAndUpdate({ user: userId }, newScopes, { new: true, upsert: true });
     }
 }

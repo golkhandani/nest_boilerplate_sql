@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { AuthorizationProvider } from '@services/authorization/authorization.provider';
 import { UserScopes } from '@services/authorization/models';
 import { ApiUseTags } from '@nestjs/swagger';
@@ -19,7 +19,7 @@ export class AuthorizationController {
     }
     @Get()
     async getScopes(
-        @Body('user') userId: string,
+        @Query('user') userId: string,
     ) {
         return this.authorizationProvider.getScopes(userId);
     }
