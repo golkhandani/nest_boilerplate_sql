@@ -21,6 +21,7 @@ import { UserScopes } from '@services/authorization/models';
 import { WLogger } from '@shared/winston/winston.ext';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_NAME } from '@shared/winston/winston.logger';
+import { UserFromWs } from '@shared/decorators';
 const events = {
     new_location: '0',
     get_reports: '1',
@@ -76,13 +77,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @UseGuards(RoleGuard)
     @SubscribeMessage(events.new_location)
     newLocationSubmit(
+        @UserFromWs() user,
         @MessageBody() data: any,
     ): Observable<WsResponse<number>> {
         const event = events.new_location;
         const response = [1, 2, 3];
 
         return from(response).pipe(
-            map(item => ({ event, data: item })),
+            map(item => ({ event, data: user })),
         );
     }
 

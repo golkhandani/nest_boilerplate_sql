@@ -6,6 +6,10 @@ export interface UserInHeader {
     role: UserRoles;
     scopes: UserScopes[];
 }
+
+export const UserFromWs = createParamDecorator((data: string, socket): User => {
+    return  data ? socket[0].handshake.user[data] : socket[0].handshake.user;
+});
 export const UserFromHeader = createParamDecorator((data: string, req): User => {
     return data ? req.user && req.user[data] : req.user;
 });

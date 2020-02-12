@@ -34,6 +34,7 @@ export class RoleGuard extends AuthGuard('jwt') {
                 socket.handshake.query.token,
                 true,
             );
+            socket.handshake.user = userWs;
             return await wsHandler(this.reflector, context, userWs);
         } else {
             await super.canActivate(context);
@@ -41,6 +42,7 @@ export class RoleGuard extends AuthGuard('jwt') {
 
         }
     }
+
 }
 
 const httpHandler =  (reflector: Reflector, context: ExecutionContext) => {
