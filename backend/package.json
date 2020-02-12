@@ -33,6 +33,7 @@
     "@nestjs/platform-socket.io": "^6.11.5",
     "@nestjs/serve-static": "^1.0.1",
     "@nestjs/swagger": "^3.1.0",
+    "@nestjs/typeorm": "^6.3.1",
     "@nestjs/websockets": "^6.11.5",
     "@types/bcrypt": "^3.0.0",
     "@types/express-rate-limit": "^3.3.2",
@@ -75,6 +76,7 @@
     "socket.io-redis": "^5.2.0",
     "swagger-ui-express": "^4.0.7",
     "type-graphql": "^0.17.5",
+    "typeorm": "^0.2.22",
     "winston": "^3.2.1",
     "winston-transport": "^4.3.0"
   },

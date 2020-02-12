@@ -21,69 +21,74 @@ export interface UserScope extends mongoose.Document {
 }
 
 /** postgres */
-import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, DeletedAt, TableOptions, HasOne, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { RefreshTokenEntity } from '@services/authentication/models';
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, EntityOptions, OneToOne, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 import { UserEntity } from '@shared/models';
 
-export const UserScopeTableOptions: TableOptions = {
-    tableName: 'auth_user_scopes',
+export const UserScopeTableOptions: EntityOptions = {
+    name: 'auth_user_scopes',
+    schema: 'public',
+    synchronize: true,
 };
-@Table(UserScopeTableOptions)
-export class UserScopeEntity extends Model<UserScopeEntity> {
-    @Column({
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
-        primaryKey: true,
+@Entity(UserScopeTableOptions.name, UserScopeTableOptions)
+export class UserScopeEntity {
+    @Column('uuid', {
+        default: () => 'uuid_generate_v1()',
     })
     // tslint:disable-next-line:variable-name
     _id: string;
 
     @Column({
-        type: DataType.BOOLEAN,
-        defaultValue: true,
-        field: 'me',
+        type: 'boolean',
+        default: true,
+        name: 'me',
     })
     ME: boolean;
 
     @Column({
-        type: DataType.BOOLEAN,
-        defaultValue: true,
-        field: 'read',
+        type: 'boolean',
+        default: true,
+        name: 'read',
     })
     READ: boolean;
 
     @Column({
-        type: DataType.BOOLEAN,
-        defaultValue: false,
-        field: 'write',
+        type: 'boolean',
+        default: false,
+        name: 'write',
     })
     WRITE: boolean;
 
     @Column({
-        type: DataType.BOOLEAN,
-        defaultValue: false,
-        field: 'god',
+        type: 'boolean',
+        default: false,
+        name: 'god',
     })
     GOD: boolean;
 
-    @ForeignKey(() => UserEntity)
-    @Column({
-        unique: true,
-        type: DataType.UUID,
-        field: 'user_id',
-    })
+    @Column('text', { nullable: true })
     // tslint:disable-next-line:variable-name
     user_id: string;
-    @BelongsTo(() => UserEntity)
+    @OneToOne(type => UserEntity,
+        (user: UserEntity) => user.refresh_token,
+    )
+    @JoinColumn({ name: 'user_id' })
     user: UserEntity;
 
-    @CreatedAt
-    @Column({ field: 'created_at' })
+    @CreateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'created_at',
+    })
+    // tslint:disable-next-line:variable-name
     createdAt: Date;
 
-    @UpdatedAt
-    @Column({ field: 'updated_at' })
-    updatedAt: Date;
+    @UpdateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'updated_at',
+    })
+    // tslint:disable-next-line:variable-name
+    updatedAt: Date | null;
 }
 
 export const USER_SCOPE_REPOSITORY_NAME = 'UserScopesRepository';

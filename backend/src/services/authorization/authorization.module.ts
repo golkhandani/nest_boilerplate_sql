@@ -5,13 +5,21 @@ import { redisConstants } from '@shared/constants';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthorizationController } from '@services/authorization/authorization.controller';
 import { AuthorizationProvider } from '@services/authorization/authorization.provider';
-import { UserScopeModelName, UserScopeSchema, UserScopesRepository } from '@services/authorization/models';
+import { UserScopeModelName, UserScopeSchema, UserScopesRepository, UserScopeEntity } from '@services/authorization/models';
 import { JwtStrategy, LocalStrategy } from '@services/authorization/strategies';
 import { PostgresModule } from '@shared/postgres/postgres.module';
+import { UserEntity } from '@shared/models/users.model';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { PhoneVerificationEntity, RefreshTokenEntity } from '@services/authentication/models';
 
 @Module({
     imports: [
-        PostgresModule,
+        TypeOrmModule.forFeature([
+            UserEntity,
+            PhoneVerificationEntity,
+            RefreshTokenEntity,
+            UserScopeEntity,
+        ]),
         CacheModule.register({
             store: redisStore,
             redisConstants,
@@ -24,7 +32,6 @@ import { PostgresModule } from '@shared/postgres/postgres.module';
         AuthorizationProvider,
         LocalStrategy,
         JwtStrategy,
-        ...UserScopesRepository,
     ],
     controllers: [
         AuthorizationController,

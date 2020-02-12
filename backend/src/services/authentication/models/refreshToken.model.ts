@@ -22,45 +22,52 @@ export class RefreshToken {
 }
 
 /** postgres */
-import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, DeletedAt, TableOptions, ForeignKey, BelongsTo} from 'sequelize-typescript';
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, EntityOptions, OneToOne, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 import { UserEntity } from '@shared/models';
 
-export const RefreshTokenTableOptions: TableOptions = {
-    tableName: 'auth_refresh_tokens',
+export const RefreshTokenTableOptions: EntityOptions = {
+    name: 'auth_refresh_tokens',
+    schema: 'public',
+    synchronize: true,
 };
-@Table(RefreshTokenTableOptions)
-export class RefreshTokenEntity extends Model<RefreshTokenEntity> {
-    @Column({
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
-        primaryKey: true,
+@Entity(RefreshTokenTableOptions.name, RefreshTokenTableOptions)
+export class RefreshTokenEntity {
+    @Column('uuid', {
+        default: () => 'uuid_generate_v1()',
     })
     // tslint:disable-next-line:variable-name
     _id: string;
 
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     token: string;
 
-    @ForeignKey(() => UserEntity)
-    @Column({
-        type: DataType.UUID,
-        field: 'user_id',
-    })
+    @Column('text', { nullable: true })
     // tslint:disable-next-line:variable-name
     user_id: string;
-    @BelongsTo(() => UserEntity)
+    @OneToOne(type => UserEntity,
+        (user: UserEntity) => user.refresh_token,
+    )
+    @JoinColumn({ name: 'user_id' })
     user: UserEntity;
 
-    @Column({type: DataType.DATE})
+    @Column({type: 'timestamptz'})
     expires: Date;
 
-    @CreatedAt
-    @Column({ field: 'created_at' })
+    @CreateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'created_at',
+    })
+    // tslint:disable-next-line:variable-name
     createdAt: Date;
 
-    @UpdatedAt
-    @Column({ field: 'updated_at' })
-    updatedAt: Date;
+    @UpdateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'updated_at',
+    })
+    // tslint:disable-next-line:variable-name
+    updatedAt: Date | null;
 }
 
 export const REFRESH_TOKEN_REPOSITORY_NAME = 'RefreshTokensRepository';

@@ -32,19 +32,23 @@ import { Op } from 'sequelize';
 import { WLogger } from '@shared/winston/winston.ext';
 import { AuthorizationProvider } from '@services/authorization/authorization.provider';
 import { UserScopes } from '@services/authorization/models';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthenticationProvider {
     constructor(
-        @Inject(USER_REPOSITORY_NAME) private readonly usersRepository: typeof UserEntity,
-        @Inject(PHONE_VERIFICATION_REPOSITORY_NAME) private readonly phoneVerificationsRepository: typeof PhoneVerificationEntity,
-        @Inject(REFRESH_TOKEN_REPOSITORY_NAME) private readonly refreshTokensRepository: typeof RefreshTokenEntity,
+        @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+        @InjectRepository(PhoneVerificationEntity) private readonly phoneVerificationRepository: Repository<PhoneVerificationEntity>,
+        @InjectRepository(RefreshTokenEntity) private readonly refreshTokenRepository: Repository<RefreshTokenEntity>,
+
+        /** */
+        // @Inject(USER_REPOSITORY_NAME) private readonly usersRepository: typeof UserEntity,
+        // @Inject(PHONE_VERIFICATION_REPOSITORY_NAME) private readonly phoneVerificationsRepository: typeof PhoneVerificationEntity,
+        // @Inject(REFRESH_TOKEN_REPOSITORY_NAME) private readonly refreshTokensRepository: typeof RefreshTokenEntity,
 
         private readonly authorizationProvider: AuthorizationProvider,
 
-        @InjectModel(UserModelName) private readonly UserModel: Model<User>,
-        @InjectModel(PhoneVerificationModelName) private readonly PhoneVerificationModel: Model<PhoneVerification>,
-        @InjectModel(RefreshTokenModelName) private readonly RefreshTokenModel: Model<RefreshToken>,
         private readonly jwtService: JwtService,
     ) { }
 
@@ -178,14 +182,14 @@ export class AuthenticationProvider {
         const fingerprint: string = headers.fingerprint || base64.encode(JSON.stringify(headers));
 
         // const existsUser: User = await this.UserModel.findOne({ fingerprint });
-        const existsUser: User = await this.usersRepository.findOne({
+        const existsUser: any = await this.userRepository.findOne({
             where: { fingerprint },
         });
         if (!existsUser) {
             const newUser = new UserEntity();
             newUser.fingerprint = fingerprint,
             newUser.role = UserRoles.GUEST;
-            const savedUser = await newUser.save();
+            const savedUser = await this.userRepository.save(newUser) as User;
             await this.authorizationProvider.initScopes(savedUser._id, [UserScopes.READ]);
             return await this.createTokenResponse(savedUser);
         } else {

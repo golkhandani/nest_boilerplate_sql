@@ -16,10 +16,10 @@ export const postgresProviders = [
               database: 'test',
             });
             sequelize.addModels([
-                UserEntity,
-                PhoneVerificationEntity,
-                RefreshTokenEntity,
-                UserScopeEntity,
+                // UserEntity,
+                // PhoneVerificationEntity,
+                // RefreshTokenEntity,
+                // UserScopeEntity,
             ]);
 
             await sequelize.sync();

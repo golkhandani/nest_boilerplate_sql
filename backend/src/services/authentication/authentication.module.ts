@@ -9,17 +9,25 @@ import {
     RefreshTokenSchema,
     PhoneVerificationsRepository,
     RefreshTokensRepository,
+    PhoneVerificationEntity,
+    RefreshTokenEntity,
 } from '@services/authentication/models';
 import { UserAlreadyExist } from '@services/authentication/validators';
 import { jwtConstants } from '@shared/constants';
-import { UserModelName, UserSchema, UsersRepository } from '@shared/models/users.model';
+import { UserModelName, UserSchema, UsersRepository, UserEntity } from '@shared/models/users.model';
 import { PostgresModule } from '@shared/postgres/postgres.module';
 import { AuthorizationProvider } from '@services/authorization/authorization.provider';
-import { UserScopesRepository } from '@services/authorization/models';
+import { UserScopesRepository, UserScopeEntity } from '@services/authorization/models';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
     imports: [
-        PostgresModule,
+        TypeOrmModule.forFeature([
+            UserEntity,
+            PhoneVerificationEntity,
+            RefreshTokenEntity,
+            UserScopeEntity,
+        ]),
         MongooseModule.forFeature([
             {
                 name: UserModelName,
@@ -42,10 +50,10 @@ import { UserScopesRepository } from '@services/authorization/models';
         UserAlreadyExist,
         AuthenticationProvider,
         AuthorizationProvider,
-        ...UsersRepository,
-        ...PhoneVerificationsRepository,
-        ...RefreshTokensRepository,
-        ...UserScopesRepository,
+        // ...UsersRepository,
+        // ...PhoneVerificationsRepository,
+        // ...RefreshTokensRepository,
+        // ...UserScopesRepository,
     ],
     controllers: [
         AuthenticationController,

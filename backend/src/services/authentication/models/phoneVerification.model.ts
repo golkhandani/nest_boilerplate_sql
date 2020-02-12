@@ -25,37 +25,45 @@ export class PhoneVerification {
 }
 
 /** postgres */
-import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, DeletedAt, TableOptions} from 'sequelize-typescript';
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, EntityOptions, OneToOne, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 
-export const PhoneVerificationTableOptions: TableOptions = {
-    tableName: 'auth_phone_verifications',
+export const PhoneVerificationTableOptions: EntityOptions = {
+    name: 'auth_phone_verifications',
+    schema: 'public',
+    synchronize: true,
 };
-@Table(PhoneVerificationTableOptions)
-export class PhoneVerificationEntity extends Model<PhoneVerificationEntity> {
-    @Column({
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
-        primaryKey: true,
+@Entity(PhoneVerificationTableOptions.name, PhoneVerificationTableOptions)
+export class PhoneVerificationEntity {
+    @Column('uuid', {
+        default: () => 'uuid_generate_v1()',
     })
     // tslint:disable-next-line:variable-name
     _id: string;
 
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     code: string;
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     phone: string;
-    @Column({type: DataType.DATE})
+    @Column({type: 'timestamptz'})
     expires: Date;
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     codeType: string;
 
-    @CreatedAt
-    @Column({ field: 'created_at' })
+    @CreateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'created_at',
+    })
+    // tslint:disable-next-line:variable-name
     createdAt: Date;
 
-    @UpdatedAt
-    @Column({ field: 'updated_at' })
-    updatedAt: Date;
+    @UpdateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'updated_at',
+    })
+    // tslint:disable-next-line:variable-name
+    updatedAt: Date | null;
 }
 
 export const PHONE_VERIFICATION_REPOSITORY_NAME = 'PhoneVerificationsRepository';

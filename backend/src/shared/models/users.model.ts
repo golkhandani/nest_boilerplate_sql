@@ -59,7 +59,8 @@ export const UserSchema = new mongoose.Schema({
     },
 });
 
-export interface User extends mongoose.Document {
+export interface IUser {
+    _id: string;
     fingerprint: string;
     username: string;
     email: string;
@@ -86,11 +87,11 @@ export class User {
 
     @ApiModelProperty()
     @Field()
-    ceartedAt: string;
+    createdAt: Date;
 
     @ApiModelProperty()
     @Field()
-    updatedAt: string;
+    updatedAt: Date;
     // private
     fingerprint: string;
     @ApiModelProperty({ required: false, nullable: true })
@@ -124,65 +125,76 @@ export class User {
 }
 
 /** postgres */
-import { Table, Column, Model, DataType, CreatedAt, UpdatedAt, DeletedAt, TableOptions, HasOne} from 'sequelize-typescript';
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn, EntityOptions, OneToOne, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 import { RefreshTokenEntity } from '@services/authentication/models';
 
-export const UserTableOptions: TableOptions = {
-    tableName: 'users',
+export const UserTableOptions: EntityOptions = {
+    name: 'users',
+    schema: 'public',
+    synchronize: true,
 };
-@Table(UserTableOptions)
-export class UserEntity extends Model<UserEntity> {
-    @Column({
-        type: DataType.UUID,
-        defaultValue: DataType.UUIDV4,
-        primaryKey: true,
+@Entity(UserTableOptions.name, UserTableOptions)
+export class UserEntity {
+    @Column('uuid', {
+        default: () => 'uuid_generate_v1()',
     })
     // tslint:disable-next-line:variable-name
     _id: string;
 
     /** Guest login */
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     fingerprint: string;
 
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     username: string;
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     email: string;
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     password: string;
 
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     google: string;
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     phone: string;
 
-    @Column({type: DataType.BOOLEAN})
+    @Column({type: 'boolean'})
     verified: boolean;
 
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     name: string;
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     picture: string;
-    @Column({type: DataType.TEXT})
+    @Column({type: 'text'})
     address: string;
 
     @Column({
-        type: DataType.ENUM(...Object.keys(UserRoles)),
-        defaultValue: UserRoles.USER,
+        // type: DataType.ENUM(...Object.keys(UserRoles)),
+        type: 'enum',
+        enum: Object.keys(UserRoles),
+        default: UserRoles.USER,
     })
     role: UserRoles;
 
-    @HasOne(() => RefreshTokenEntity)
+    @OneToOne(() => RefreshTokenEntity)
+    @JoinColumn({name: 'refresh_token'})
     // tslint:disable-next-line:variable-name
     refresh_token: RefreshTokenEntity;
 
-    @CreatedAt
-    @Column({ field: 'created_at' })
+    @CreateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'created_at',
+    })
+    // tslint:disable-next-line:variable-name
     createdAt: Date;
 
-    @UpdatedAt
-    @Column({ field: 'updated_at' })
-    updatedAt: Date;
+    @UpdateDateColumn({
+        type: 'timestamptz',
+        default: () => 'CURRENT_TIMESTAMP',
+        name: 'updated_at',
+    })
+    // tslint:disable-next-line:variable-name
+    updatedAt: Date | null;
 }
 
 export const USER_REPOSITORY_NAME = 'UsersRepository';

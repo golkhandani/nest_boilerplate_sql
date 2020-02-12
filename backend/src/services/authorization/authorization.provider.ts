@@ -3,11 +3,15 @@ import { Model } from 'mongoose';
 import { BadRequestException, Injectable, Inject, NotAcceptableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserScope, UserScopeModelName, UserScopes, USER_SCOPE_REPOSITORY_NAME, UserScopeEntity } from '@services/authorization/models';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthorizationProvider {
     constructor(
-        @Inject(USER_SCOPE_REPOSITORY_NAME) private readonly userScopesRepository: typeof UserScopeEntity,
+        @InjectRepository(UserScopeEntity) private readonly userScopesRepository: Repository<UserScopeEntity>,
+
+        // @Inject(USER_SCOPE_REPOSITORY_NAME) private readonly userScopesRepository: typeof UserScopeEntity,
 
         // @InjectModel(UserScopeModelName) private readonly UserScopeModel: Model<UserScope>,
     ) { }
@@ -36,7 +40,7 @@ export class AuthorizationProvider {
                 validatedScopes[scope] = true;
             }
         });
-        return await this.userScopesRepository.upsert({
+        return await this.userScopesRepository.insert({
             user_id: userId,
             ...validatedScopes,
         });
