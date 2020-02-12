@@ -12,7 +12,6 @@ export class AuthorizationProvider {
         // @InjectModel(UserScopeModelName) private readonly UserScopeModel: Model<UserScope>,
     ) { }
     async getScopes(userId: string): Promise<string[]> {
-        console.log('getScopes', 1, userId);
         const userScopesObj: UserScopeEntity = await this.userScopesRepository.findOne({ where: { user_id: userId }});
         if (!userScopesObj) {
             throw new NotAcceptableException();
@@ -81,11 +80,11 @@ export class AuthorizationProvider {
         }
         const newScopes = { $pull: { scopes } };
         // return await this.UserScopeModel.findOneAndUpdate({ user: userId }, newScopes, { new: true, upsert: true });
-
+        const x =  await this.userScopesRepository.sequelize.query('SELECT * FROM users');
         const userScopes = await this.userScopesRepository.upsert({
             user_id: userId,
             ...validatedScopes,
         }, { returning: true });
-        return userScopes;
+        return x;
     }
 }

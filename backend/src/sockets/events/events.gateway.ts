@@ -3,13 +3,10 @@ import {
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
-    WsResponse,
     ConnectedSocket,
     OnGatewayConnection,
     OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
 import { AuthenticationProvider } from '@services/authentication/authentication.provider';
 import { User } from '@shared/models';
@@ -28,7 +25,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         this.connectedUsers = [...this.connectedUsers, String(user._id)];
 
-        console.log(this.connectedUsers);
         // Send list of connected users
         this.server.emit('users', this.connectedUsers);
     }
@@ -53,7 +49,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('events')
     findAll(@MessageBody() data: any): string {
         this.server.emit('events', 'ok');
-        console.log('HEQW');
         return 'hi' + JSON.stringify(data);
     }
 

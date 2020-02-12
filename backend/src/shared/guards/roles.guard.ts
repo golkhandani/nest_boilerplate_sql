@@ -1,11 +1,8 @@
 
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { User } from '@shared/models/users.model';
 import { AuthGuard } from '@nestjs/passport';
-import { GqlExecutionContext } from '@nestjs/graphql';
 
 /**
  * decorator for role base authentication
