@@ -32,4 +32,3 @@ export const kavenegarConstants = {
     sender: 100400,
     template: 'voices-verification',
 };
-

@@ -55,7 +55,7 @@ export class UsersProfileController {
         };
     }
 
-    @Roles(UserRoles.USER)
+    @Roles(UserRoles.USER, UserRoles.GUEST)
     @Scopes(UserScopes.ME)
     @UseGuards(RoleGuard)
     @Get('me')

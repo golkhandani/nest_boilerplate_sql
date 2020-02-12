@@ -13,6 +13,9 @@
       ],
       "@shared/*": [
         "shared/*"
+      ],
+      "@sockets/*":[
+        "sockets/*"
       ]
     },
     "module": "commonjs",
@@ -20,7 +23,7 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2017",
+    "target": "es2019",
     "sourceMap": true,
     "outDir": "./dist",
     "incremental": true

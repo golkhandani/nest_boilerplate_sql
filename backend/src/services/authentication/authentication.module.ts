@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
@@ -13,6 +13,7 @@ import { jwtConstants } from '@shared/constants';
 import { UserModelName, UserSchema } from '@shared/models/users.model';
 import { AuthorizationModule } from '@services/authorization/authorization.module';
 
+@Global()
 @Module({
     imports: [
         AuthorizationModule,

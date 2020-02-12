@@ -4,7 +4,7 @@ import { Logger } from 'winston';
 @Controller()
 export class AppController {
   constructor(@Inject('winston') private readonly logger: Logger) {
-    console.log(this.logger);
+    // console.log(this.logger);
   }
 
   @Get('ping')

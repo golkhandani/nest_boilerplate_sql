@@ -82,6 +82,7 @@ export class User {
     @ApiModelProperty()
     // tslint:disable-next-line: variable-name
     @Field(type => ID)
+    // tslint:disable-next-line: variable-name
     _id: string;
 
     @ApiModelProperty()

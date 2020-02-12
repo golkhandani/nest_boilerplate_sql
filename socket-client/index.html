@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <script src="socket.io.js"></script>
+    <script>
+      const socket = io('http://localhost:3001?token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTQzZWYxNTFmYTE4YzJmNzBjZGIyNzYiLCJyb2xlIjoiR1VFU1QiLCJpYXQiOjE1ODE1MjkxMjIsImV4cCI6MTU4MTU3MjMyMiwiYXVkIjoic2VydmljZS5jb20iLCJpc3MiOiJhdXRoLmNvbSIsInN1YiI6ImV5SmZhV1FpT2lJMVpUUXpaV1l4TlRGbVlURTRZekptTnpCalpHSXlOellpTENKeWIyeGxJam9pUjFWRlUxUWlmUT09In0.QCc9e-upk4TJvVtd5XPeGVNZoQ_7xyMGkUIsaqBR-z1aWbzeWraNr-7YHRF5jjTPPaygRoW537EYvvoLPrALmQ');
+      const messages = {
+        new_location: 0,
+        get_reports: 1,
+        post_reports: 2,
+      };
+
+      socket.on('connect', function() {
+        console.log('Connected');
+
+		socket.emit(messages.new_location, { test: 'test' });
+		socket.emit(messages.get_reports, { test: 'test' });
+        socket.emit('events', { test: 'test' });
+        socket.emit('identity', 0, response =>
+          console.log('Identity:', response),
+        );
+	  });
+	  socket.on(messages.new_location, function(data) {
+        console.log('messages.new_location', data);
+      });
+      socket.on('events', function(data) {
+        console.log('event', data);
+      });
+      socket.on('exception', function(data) {
+        console.log('event', data);
+      });
+      socket.on('disconnect', function() {
+        console.log('Disconnected');
+      });
+    </script>
+  </head>
+
+  <body></body>
+</html>

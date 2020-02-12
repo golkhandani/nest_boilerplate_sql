@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { AppController } from './app.controller';
-import { AuthenticationModule } from './services/authentication/authentication.module';
-import { UsersProfileModule } from './services/profiles/profiles.modules';
-import { AuthorizationModule } from './services/authorization/authorization.module';
+import { AuthenticationModule } from '@services/authentication/authentication.module';
+import { UsersProfileModule } from '@services/profiles/profiles.modules';
+import { AuthorizationModule } from '@services/authorization/authorization.module';
 import { mongoConstants } from '@shared/constants/mongoConstants';
-import { EventsModule } from './sockets/events/events.module';
 
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import { WinstonOptions } from '@shared/winston/winston.logger';
+import { SocketAppModule } from '@sockets/socketApp.module';
 
 @Module({
   imports: [
@@ -25,10 +25,12 @@ import { WinstonOptions } from '@shared/winston/winston.logger';
 
     UsersProfileModule,
 
-    EventsModule,
+    SocketAppModule,
 
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController,
+  ],
   providers: [],
 })
 export class AppModule { }

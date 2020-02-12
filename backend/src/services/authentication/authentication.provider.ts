@@ -3,7 +3,7 @@ import { compareSync, genSaltSync, hashSync } from 'bcrypt';
 import * as moment from 'moment';
 import { Model } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
-import { ForbiddenException, HttpException, Injectable, NotFoundException, BadRequestException, BadGatewayException, HttpStatus } from '@nestjs/common';
+import { ForbiddenException, HttpException, Injectable, NotFoundException, BadRequestException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 // dtos
@@ -25,6 +25,7 @@ import { User, UserModelName, UserRoles } from '@shared/models';
 import { WsException } from '@nestjs/websockets';
 import { AuthorizationProvider } from '@services/authorization/authorization.provider';
 import { UserScopes } from '@services/authorization/models';
+import { WLogger } from '@shared/winston/winston.ext';
 
 @Injectable()
 export class AuthenticationProvider {
@@ -73,10 +74,10 @@ export class AuthenticationProvider {
             const payload = this.jwtService.verify(token, {
                 algorithms: [jwtConstants.algorithm],
             });
-            console.log(payload);
-            const user = await this.UserModel.findById(payload._id);
+            // console.log(payload);
+            // const user = await this.UserModel.findById(payload._id);
 
-            if (!user) {
+            if (!payload) {
                 if (isWs) {
                     throw new WsException('Unauthorized access');
                 } else {
@@ -86,8 +87,8 @@ export class AuthenticationProvider {
                     );
                 }
             }
-
-            return user;
+            payload.scopes = (await this.authorizationProvider.getScopes(payload._id));
+            return payload;
         } catch (err) {
             if (isWs) {
                 throw new WsException(err.message);
@@ -195,7 +196,7 @@ export class AuthenticationProvider {
     }
     private sendVerificationEmail(token: string) {
         // send email
-        console.log('MAIL SENT WITH TOKEN : ', token);
+        WLogger.log('MAIL SENT WITH TOKEN : ', token);
     }
     public async signupByEmailPass(userObj: SignupByEmail): Promise<UserWithToken> {
         (userObj as any).password = this.generatedHashPassword(userObj.password);

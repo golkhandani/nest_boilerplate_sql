@@ -37,7 +37,7 @@ async function bootstrap() {
   // For sake of same level dependencies (providers)
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-  app.enableCors();
+  // app.enableCors();
 
   app.use(helmet());
 

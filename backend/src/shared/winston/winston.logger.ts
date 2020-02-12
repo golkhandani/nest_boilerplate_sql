@@ -49,10 +49,11 @@ class Logger {
                 //  new winston.transports.Console({ format: consoleFormat }),
             ],
         };
-        this.logger = winston.createLogger(this.options)
+        this.logger = winston.createLogger(this.options);
         return this;
     }
 }
 
 export const WinstonOptions = (new Logger(winstonConstants.LOGGER_SERVICE_NAME)).options;
 export const WinstonLogger = (new Logger(winstonConstants.LOGGER_SERVICE_NAME)).logger;
+export const WINSTON_MODULE_NAME = 'winston';
