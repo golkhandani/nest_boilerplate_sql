@@ -13,7 +13,7 @@ export class AuthorizationController {
     @Post()
     async addScopes(
         @Body('scopes') scopes: UserScopes[],
-        @Body('user') userId: string,
+        @Query('user') userId: string,
     ) {
         return this.authorizationProvider.addScopes(userId, scopes);
     }
@@ -26,7 +26,7 @@ export class AuthorizationController {
     @Delete()
     async removeScopes(
         @Body('scopes') scopes: UserScopes[],
-        @Body('user') userId: string,
+        @Query('user') userId: string,
     ) {
         return this.authorizationProvider.removeScopes(userId, scopes);
     }
