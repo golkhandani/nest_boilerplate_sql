@@ -1,22 +1,39 @@
 import * as mongoose from 'mongoose';
 
-export const UserScopeModelName = 'Auth_UserScope';
+export const UserScopeModelName = 'auth_user_scope';
 
 export enum UserScopes {
     ME = 'ME',
     READ = 'READ',
     WRITE = 'WRITE',
-    READWRITE = 'READWRITE',
     GOD = 'GOD',
 }
 export const UserScopeSchema = new mongoose.Schema({
     user: String,
-    scopes: [String],
+    ME: {
+        type: Boolean,
+        default: true,
+    },
+    READ: {
+        type: Boolean,
+        default: true,
+    },
+    WRITE: {
+        type: Boolean,
+        default: true,
+    },
+    GOD: {
+        type: Boolean,
+        default: true,
+    },
 }, {
         timestamps: true,
     });
 
 export interface UserScope extends mongoose.Document {
     readonly user: string;
-    readonly scopes: string[];
+    readonly ME: boolean;
+    readonly READ: boolean;
+    readonly WRITE: boolean;
+    readonly GOD: boolean;
 }

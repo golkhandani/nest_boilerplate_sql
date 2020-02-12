@@ -11,9 +11,11 @@ import {
 import { UserAlreadyExist } from '@services/authentication/validators';
 import { jwtConstants } from '@shared/constants';
 import { UserModelName, UserSchema } from '@shared/models/users.model';
+import { AuthorizationModule } from '@services/authorization/authorization.module';
 
 @Module({
     imports: [
+        AuthorizationModule,
         MongooseModule.forFeature([
             {
                 name: UserModelName,

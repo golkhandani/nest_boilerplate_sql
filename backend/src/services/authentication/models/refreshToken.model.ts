@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-export const RefreshTokenModelName = 'Auth_RefreshToken';
+export const RefreshTokenModelName = 'auth_refresh_token';
 export const RefreshTokenSchema = new mongoose.Schema({
     token: String,
     user: mongoose.Schema.Types.ObjectId,

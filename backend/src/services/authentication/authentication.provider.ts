@@ -23,6 +23,8 @@ import { OS } from '@shared/enums';
 // shared models
 import { User, UserModelName, UserRoles } from '@shared/models';
 import { WsException } from '@nestjs/websockets';
+import { AuthorizationProvider } from '@services/authorization/authorization.provider';
+import { UserScopes } from '@services/authorization/models';
 
 @Injectable()
 export class AuthenticationProvider {
@@ -31,6 +33,7 @@ export class AuthenticationProvider {
         @InjectModel(PhoneVerificationModelName) private readonly PhoneVerificationModel: Model<PhoneVerification>,
         @InjectModel(RefreshTokenModelName) private readonly RefreshTokenModel: Model<RefreshToken>,
         private readonly jwtService: JwtService,
+        private readonly authorizationProvider: AuthorizationProvider,
     ) { }
 
     async findByUniquesForValidation(value: string): Promise<User> {
@@ -151,6 +154,8 @@ export class AuthenticationProvider {
             };
             const newUser = new this.UserModel(userObj);
             const savedUser = await newUser.save() as User;
+            await this.authorizationProvider.initScopes(savedUser._id, [UserScopes.READ]);
+
             return await this.createTokenResponse(savedUser);
         } else {
             return await this.createTokenResponse(existsUser);
@@ -161,6 +166,8 @@ export class AuthenticationProvider {
         userObj.password = this.generatedHashPassword(userObj.password);
         const newUser = new this.UserModel(Object.assign(userObj, { verified: true }));
         const savedUser = await newUser.save() as User;
+        await this.authorizationProvider.initScopes(savedUser._id, [UserScopes.ME, UserScopes.READ]);
+
         return await this.createTokenResponse(savedUser);
     }
     public async signinByUserPass(username: string, password: string): Promise<UserWithToken> {
@@ -194,6 +201,8 @@ export class AuthenticationProvider {
         (userObj as any).password = this.generatedHashPassword(userObj.password);
         const newUser = new this.UserModel(Object.assign(userObj, { verified: false }));
         const savedUser = await newUser.save() as User;
+        await this.authorizationProvider.initScopes(savedUser._id, [UserScopes.ME, UserScopes.READ]);
+
         // send verification mail
         const token = this.generalTokenEncode({ email: userObj.email });
         await this.sendVerificationEmail(token);
@@ -267,6 +276,8 @@ export class AuthenticationProvider {
                     Object.assign({ phone }, { verified: true }),
                 );
                 const savedUser = await newUser.save() as User;
+                await this.authorizationProvider.initScopes(savedUser._id, [UserScopes.ME, UserScopes.READ]);
+
                 return await this.createTokenResponse(savedUser);
             }
         } else {
@@ -305,6 +316,8 @@ export class AuthenticationProvider {
                     Object.assign(googleUser, { verified: true }),
                 );
                 const savedUser = await newUser.save() as User;
+                await this.authorizationProvider.initScopes(savedUser._id, [UserScopes.ME, UserScopes.READ]);
+
                 return await this.createTokenResponse(savedUser);
 
             } else if (userWithGoogle) {

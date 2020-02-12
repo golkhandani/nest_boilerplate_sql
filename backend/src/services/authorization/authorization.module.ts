@@ -25,6 +25,8 @@ import { JwtStrategy, LocalStrategy } from '@services/authorization/strategies';
     controllers: [
         AuthorizationController,
     ],
-    exports: [],
+    exports: [
+        AuthorizationProvider
+    ],
 })
 export class AuthorizationModule { }
